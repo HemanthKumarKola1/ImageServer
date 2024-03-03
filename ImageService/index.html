@@ -1,0 +1,95 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Display</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+</head>
+<body>
+    <div>
+        <h1>Upload Image</h1>
+        <form id="uploadForm" enctype="multipart/form-data" hx-post="/upload">
+            <input type="file" name="image" required><br>
+            <input type="text" name="userID" placeholder="User ID" required><br>
+            <input type="datetime-local" name="futureTime" placeholder="Future Time" required><br>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    <hr>
+    <div>
+        <h2>Uploaded Images</h2>
+        {{range .Images}}
+            <img src="{{.}}" alt="Uploaded Image">
+        {{end}}
+    </div>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Upload and Display</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Upload Image and Display</h2>
+
+<form id="uploadForm" enctype="multipart/form-data">
+    <label for="image">Select Image:</label>
+    <input type="file" id="image" name="image"><br><br>
+    <label for="time">Select Time:</label>
+    <input type="datetime-local" id="time" name="time"><br><br>
+    <label for="userId">User ID:</label>
+    <input type="text" id="userId" name="userId"><br><br>
+    <label for="message">Message:</label>
+    <textarea id="message" name="message"></textarea><br><br>
+    <button type="submit">Upload Image</button>
+</form>
+
+<div id="imageContainer">
+    <h3>Image from Server:</h3>
+    <img id="displayedImage" src="" alt="Image">
+</div>
+
+<script>
+$(document).ready(function(){
+    // Handle form submission
+    $('#uploadForm').submit(function(event){
+        event.preventDefault();
+        
+        // Prepare form data
+        var formData = new FormData();
+        formData.append('image', $('#image')[0].files[0]);
+        formData.append('time', $('#time').val());
+        formData.append('userId', $('#userId').val());
+        formData.append('message', $('#message').val());
+        
+        // AJAX request to upload image
+        $.ajax({
+            url: 'http://localhost:8080/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response){
+                // If upload successful, display the uploaded image
+                $('#displayedImage').attr('src', 'http://localhost:8080/get-images');
+            },
+            error: function(xhr, status, error){
+                console.error(xhr.responseText);
+            }
+        });
+    });
+    
+    // Load initial image
+    $('#displayedImage').attr('src', 'http://localhost:8080/get-images');
+});
+</script>
+
+</body>
+</html>
