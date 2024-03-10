@@ -2,9 +2,10 @@
 INSERT INTO schedules(
   schedule_time,
   user_id,
-  message
+  message,
+  image_data
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 ) RETURNING *;
 
 -- name: GetSchedule :one

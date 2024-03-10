@@ -13,22 +13,34 @@ const createSchedule = `-- name: CreateSchedule :one
 INSERT INTO schedules(
   schedule_time,
   user_id,
-  message
+  message,
+  image_data
 ) VALUES (
-  $1, $2, $3
-) RETURNING schedule_time, user_id, message
+  $1, $2, $3, $4
+) RETURNING schedule_time, user_id, message, image_data
 `
 
 type CreateScheduleParams struct {
 	ScheduleTime int32  `json:"schedule_time"`
 	UserID       string `json:"user_id"`
 	Message      string `json:"message"`
+	ImageData    []byte `json:"image_data"`
 }
 
 func (q *Queries) CreateSchedule(ctx context.Context, arg CreateScheduleParams) (Schedule, error) {
-	row := q.db.QueryRowContext(ctx, createSchedule, arg.ScheduleTime, arg.UserID, arg.Message)
+	row := q.db.QueryRow(ctx, createSchedule,
+		arg.ScheduleTime,
+		arg.UserID,
+		arg.Message,
+		arg.ImageData,
+	)
 	var i Schedule
-	err := row.Scan(&i.ScheduleTime, &i.UserID, &i.Message)
+	err := row.Scan(
+		&i.ScheduleTime,
+		&i.UserID,
+		&i.Message,
+		&i.ImageData,
+	)
 	return i, err
 }
 
@@ -38,18 +50,23 @@ WHERE schedule_time = $1
 `
 
 func (q *Queries) DeleteSchedule(ctx context.Context, scheduleTime int32) error {
-	_, err := q.db.ExecContext(ctx, deleteSchedule, scheduleTime)
+	_, err := q.db.Exec(ctx, deleteSchedule, scheduleTime)
 	return err
 }
 
 const getSchedule = `-- name: GetSchedule :one
-SELECT schedule_time, user_id, message FROM schedules
+SELECT schedule_time, user_id, message, image_data FROM schedules
 WHERE schedule_time= $1 LIMIT 1
 `
 
 func (q *Queries) GetSchedule(ctx context.Context, scheduleTime int32) (Schedule, error) {
-	row := q.db.QueryRowContext(ctx, getSchedule, scheduleTime)
+	row := q.db.QueryRow(ctx, getSchedule, scheduleTime)
 	var i Schedule
-	err := row.Scan(&i.ScheduleTime, &i.UserID, &i.Message)
+	err := row.Scan(
+		&i.ScheduleTime,
+		&i.UserID,
+		&i.Message,
+		&i.ImageData,
+	)
 	return i, err
 }

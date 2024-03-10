@@ -10,4 +10,5 @@ type Schedule struct {
 	ScheduleTime int32  `json:"schedule_time"`
 	UserID       string `json:"user_id"`
 	Message      string `json:"message"`
+	ImageData    []byte `json:"image_data"`
 }
